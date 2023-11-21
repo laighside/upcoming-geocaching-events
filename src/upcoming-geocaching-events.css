@@ -1,0 +1,15 @@
+
+.gc-event-table {
+}
+
+.gc-event-table-row > td {
+  vertical-align: middle;
+}
+
+.gc-event-highlight {
+  background-image: linear-gradient(#61CE70, rgba(97, 206, 112, 0.3), rgba(97, 206, 112, 0.3), rgba(97, 206, 112, 0.3), #61CE70);
+}
+
+.gc-event-spacer {
+}
+
