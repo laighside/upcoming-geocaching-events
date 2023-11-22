@@ -112,7 +112,7 @@ window.wp = window.wp || {};
      * @return {boolean} Always returns false at the end of execution.
      */
     edit : function(id) {
-        var t = this, fields, editRow, rowData, status, pageOpt, pageLevel, nextPage, pageLoop = true, nextLevel, f, val, pw;
+        var t = this, fields, editRow, rowData, f, val;
         t.revert();
 
         if ( typeof(id) === 'object' ) {
@@ -146,7 +146,12 @@ window.wp = window.wp || {};
                 $(':input[name="' + fields[f] + '"]', editRow).val( val );
             }
         } else {
-            $(".event-tr:last").after(editRow).after('<tr class="hidden"></tr>');
+            var lastRow = $(".event-tr:last");
+            if (lastRow.length > 0) { // There's already an event in the table
+                lastRow.after(editRow).after('<tr class="hidden"></tr>');
+            } else { // No events in the table
+                $("#the-list").append(editRow).after('<tr class="hidden"></tr>');
+            }
         }
 
         $(editRow).attr('id', 'edit_'+id).addClass('inline-editor').show();
