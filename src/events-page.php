@@ -56,9 +56,10 @@ function print_event_name_cell($event, $options, $is_own_event = false, $show_ot
     }
     $isArchived = ($event->event_status == "A");
     $nameHtml = "<a href='". esc_url("https://coord.info/" . $event->gc_code) . "'" . ($isArchived ? " style=\"color:red;\"" : "") . ">" . esc_html($event->gc_code) . " - " . esc_html($event->event_name) . ($isArchived ? $archivedHtml : "") . "</a>";
-    $otherNameHtml = "<span style=\"font-size:12px;\">" . esc_html($event->other_name) . "</span><br />";
+    $hasOtherName = isset($event->other_name) && (strlen($event->other_name) > 0);
+    $otherNameHtml = $hasOtherName ? "<span style=\"font-size:12px;\">" . esc_html($event->other_name) . "</span><br />" : "";
     echo "<td>";
-    if ($show_other_name && strlen($event->other_name) > 0) {
+    if ($show_other_name && $hasOtherName) {
         echo $otherNameHtml . $nameHtml;
     } else {
         echo $nameHtml . $placedByHtml;
@@ -69,16 +70,16 @@ function print_event_name_cell($event, $options, $is_own_event = false, $show_ot
 function print_event_date_cell($event, $local_state_name) {
     $date = date_create($event->event_date);
     $date_str = ($event->event_date > 0) ? date_format($date,"jS M Y") : "";
-    $has_state = boolval($event->osm_state);
-    $has_town = boolval($event->osm_town);
+    $has_state = isset($event->osm_state);
+    $has_town = isset($event->osm_town);
     $town_name = "";
     if ($has_town) {
         $town_name = $event->osm_town;
-        if ($event->osm_state != $local_state_name && $has_state) {
+        if ($has_state && $event->osm_state != $local_state_name) {
             $town_name = $event->osm_town . ", " . $event->osm_state;
         }
     } else {
-        if ($event->osm_state != $local_state_name && $has_state) {
+        if ($has_state && $event->osm_state != $local_state_name) {
             $town_name = $event->osm_state;
         }
     }
