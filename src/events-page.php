@@ -26,6 +26,30 @@ function get_event_icon($event_type) {
         return plugins_url( 'img/cito.gif', __FILE__ );
     case 'Mega':
         return plugins_url( 'img/mega.gif', __FILE__ );
+    case 'CCE':
+        return plugins_url( 'img/cce.gif', __FILE__ );
+    case 'Block':
+        return plugins_url( 'img/block.gif', __FILE__ );
+    default:
+        return "";
+    }
+}
+
+/**
+ * Gets the full name of the event type
+ */
+function get_event_full_type($event_type) {
+    switch( $event_type ) {
+    case 'Event':
+        return "Event";
+    case 'CITO':
+        return "Cache In Trash Out";
+    case 'Mega':
+        return "Mega Event";
+    case 'CCE':
+        return "Community Celebration Event";
+    case 'Block':
+        return "Block Party";
     default:
         return "";
     }
@@ -43,7 +67,7 @@ function get_events_json($options) {
 }
 
 function print_event_icon_cell($event) {
-    echo "<td><img src=\"" . get_event_icon($event->event_type) . "\" alt=\"" . esc_attr($event->event_type) . "\"/></td>";
+    echo "<td><img src=\"" . get_event_icon($event->event_type) . "\" alt=\"" . esc_attr(get_event_full_type($event->event_type)) . "\"/></td>";
 }
 
 function print_event_name_cell($event, $options, $is_own_event = false, $show_other_name = false) {
