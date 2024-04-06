@@ -72,14 +72,23 @@ function print_event_icon_cell($event) {
 
 function print_event_name_cell($event, $options, $is_own_event = false, $show_other_name = false) {
     $logo_url = $options['gc_events_owner_logo_url'];
-    $archivedHtml = " <span style=\"font-weight:bold;color:red;\">(Archived)</span>";
     $placedByHtml = $event->placed_by ? ("<br /><span style=\"font-size:12px;\">by " . esc_html($event->placed_by) . "</span>") : "";
     if ($is_own_event && $event->placed_by && strlen($logo_url) > 0) {
         $img_element = "<img src=\"" . esc_url($logo_url) . "\" alt=\"" . esc_attr($event->placed_by) . "\" style=\"height:20px;\">";
         $placedByHtml = "<br /><span style=\"font-size:12px;\">by " . $img_element . "</span>";
     }
     $isArchived = ($event->event_status == "A");
-    $nameHtml = "<a href='". esc_url("https://coord.info/" . $event->gc_code) . "'" . ($isArchived ? " style=\"color:red;\"" : "") . ">" . esc_html($event->gc_code) . " - " . esc_html($event->event_name) . ($isArchived ? $archivedHtml : "") . "</a>";
+    $isDisabled = ($event->event_status == "D");
+    $isUnpublished = ($event->event_status == "U");
+    $statusHtml = "";
+    if ($isArchived) {
+        $statusHtml = " <span style=\"font-weight:bold;color:red;\">(Archived)</span>";
+    } else if ($isDisabled) {
+        $statusHtml = " <span style=\"font-weight:bold;\">(Temporarily disabled)</span>";
+    } else if ($isUnpublished) {
+        $statusHtml = " <span style=\"font-weight:bold;color:red;\">(Unpublished)</span>";
+    }
+    $nameHtml = "<a href='". esc_url("https://coord.info/" . $event->gc_code) . "'" . ($isArchived ? " style=\"color:red;\"" : "") . ">" . esc_html($event->gc_code) . " - " . esc_html($event->event_name) . $statusHtml . "</a>";
     $hasOtherName = isset($event->other_name) && (strlen($event->other_name) > 0);
     $otherNameHtml = $hasOtherName ? "<span style=\"font-size:12px;\">" . esc_html($event->other_name) . "</span><br />" : "";
     echo "<td>";
