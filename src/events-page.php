@@ -67,7 +67,7 @@ function get_events_json($options) {
 }
 
 function print_event_icon_cell($event) {
-    echo "<td><img src=\"" . get_event_icon($event->event_type) . "\" alt=\"" . esc_attr(get_event_full_type($event->event_type)) . "\"/></td>";
+    return "<td><img src=\"" . get_event_icon($event->event_type) . "\" alt=\"" . esc_attr(get_event_full_type($event->event_type)) . "\"/></td>";
 }
 
 function print_event_name_cell($event, $options, $is_own_event = false, $show_other_name = false) {
@@ -91,13 +91,15 @@ function print_event_name_cell($event, $options, $is_own_event = false, $show_ot
     $nameHtml = "<a href='". esc_url("https://coord.info/" . $event->gc_code) . "'" . ($isArchived ? " style=\"color:red;\"" : "") . ">" . esc_html($event->gc_code) . " - " . esc_html($event->event_name) . $statusHtml . "</a>";
     $hasOtherName = isset($event->other_name) && (strlen($event->other_name) > 0);
     $otherNameHtml = $hasOtherName ? "<span style=\"font-size:12px;\">" . esc_html($event->other_name) . "</span><br />" : "";
-    echo "<td>";
+
+    $html_out = "<td>";
     if ($show_other_name && $hasOtherName) {
-        echo $otherNameHtml . $nameHtml;
+        $html_out .= $otherNameHtml . $nameHtml;
     } else {
-        echo $nameHtml . $placedByHtml;
+        $html_out .= $nameHtml . $placedByHtml;
     }
-    echo "</td>";
+    $html_out .= "</td>";
+    return $html_out;
 }
 
 function print_event_date_cell($event, $local_state_name) {
@@ -116,9 +118,10 @@ function print_event_date_cell($event, $local_state_name) {
             $town_name = $event->osm_state;
         }
     }
-    echo "<td style=\"text-align:right;\">";
-    echo esc_html($date_str) . ((strlen($town_name) > 0) ? ("<br /><span style=\"font-size:12px;\">" . esc_html($town_name) . "</span>") : "");
-    echo "</td>";
+    $html_out = "<td style=\"text-align:right;\">";
+    $html_out .= esc_html($date_str) . ((strlen($town_name) > 0) ? ("<br /><span style=\"font-size:12px;\">" . esc_html($town_name) . "</span>") : "");
+    $html_out .= "</td>";
+    return $html_out;
 }
 
 /**
@@ -137,8 +140,7 @@ function gc_events_page() {
         $mega_events = $event_data->megas;
         $other_events = $event_data->others;
     } else {
-        echo "<p style=\"color:red;\">Error while fetching event list</p>";
-        return;
+        return "<p style=\"color:red;\">Error while fetching event list</p>";
     }
 
     // Make sure the event are ordered by date
@@ -148,40 +150,43 @@ function gc_events_page() {
     $national_events = array_merge($mega_events, $other_events);
     sort_events_by_date($national_events);
 
+    $html_out = "";
+
     $local_state_name = get_state_full_name($options['gc_events_state']);
 
     // Local events table
     if (count($local_events) > 0) {
-        echo "<h4>" . esc_html($local_state_name) . " Events</h4>";
-        echo "<table class=\"gc-event-table\">";
+        $html_out .= "<h4>" . esc_html($local_state_name) . " Events</h4>";
+        $html_out .= "<table class=\"gc-event-table\">";
         foreach($local_events as $item) {
             $is_own_event = boolval($item->owner_id === intval($options['gc_events_owner_id']));
-            echo "<tr class=\"gc-event-table-row" . ($is_own_event ? " gc-event-highlight" : "") . "\">";
+            $html_out .= "<tr class=\"gc-event-table-row" . ($is_own_event ? " gc-event-highlight" : "") . "\">";
 
-            print_event_icon_cell($item);
-            print_event_name_cell($item, $options, $is_own_event, false);
-            print_event_date_cell($item, $local_state_name);
+            $html_out .= print_event_icon_cell($item);
+            $html_out .= print_event_name_cell($item, $options, $is_own_event, false);
+            $html_out .= print_event_date_cell($item, $local_state_name);
 
-            echo "</tr>";
-            //echo "<tr class=\"gc-event-spacer\"></tr>";
+            $html_out .= "</tr>";
+            //$html_out .= "<tr class=\"gc-event-spacer\"></tr>";
         }
-        echo '</table>';
+        $html_out .= '</table>';
     }
 
     // National Events table
     if (count($national_events) > 0) {
-        echo "<h4>National Events</h4>";
-        echo "<table class=\"gc-event-table\">";
+        $html_out .= "<h4>National Events</h4>";
+        $html_out .= "<table class=\"gc-event-table\">";
         foreach($national_events as $item) {
-            echo "<tr class=\"gc-event-table-row\">";
+            $is_own_event = boolval($item->owner_id === intval($options['gc_events_owner_id']));
+            $html_out .= "<tr class=\"gc-event-table-row" . ($is_own_event ? " gc-event-highlight" : "") . "\">";
 
-            print_event_icon_cell($item);
-            print_event_name_cell($item, $options, false, true);
-            print_event_date_cell($item, null);
+            $html_out .= print_event_icon_cell($item);
+            $html_out .= print_event_name_cell($item, $options, $is_own_event, true);
+            $html_out .= print_event_date_cell($item, null);
 
-            echo '</tr>';
+            $html_out .= '</tr>';
         }
-        echo '</table>';
+        $html_out .= '</table>';
     }
 
     // Planned events table
@@ -193,23 +198,24 @@ function gc_events_page() {
         $website_name = get_bloginfo("name");
         $logo_url = $options['gc_events_owner_logo_url'];
         $name_html = (strlen($logo_url) > 0) ? "<img src=\"" . esc_url($logo_url) . "\" alt=\"" . esc_attr($website_name) . "\" style=\"height:32px;\" />" : esc_html($website_name);
-        echo "<h4>Planned events by " . $name_html . "</h4>";
-        echo "<table>";
+        $html_out .= "<h4>Planned events by " . $name_html . "</h4>";
+        $html_out .= "<table>";
         foreach ( $result as $item ) {
-            echo "<tr class=\"gc-event-table-row\">";
+            $html_out .= "<tr class=\"gc-event-table-row\">";
             if (strlen($item->event_url)) {
-                echo "<td><a href=\"" . esc_url($item->event_url) . "\">" . esc_html($item->event_name) . "</a></td>";
+                $html_out .= "<td><a href=\"" . esc_url($item->event_url) . "\">" . esc_html($item->event_name) . "</a></td>";
             } else {
-                echo "<td>" . esc_html($item->event_name) . "</td>";
+                $html_out .= "<td>" . esc_html($item->event_name) . "</td>";
             }
-            echo "<td>" . esc_html($item->location) . "</td>";
-            print_event_date_cell($item, null);
-            echo "</tr>";
+            $html_out .= "<td>" . esc_html($item->location) . "</td>";
+            $html_out .= print_event_date_cell($item, null);
+            $html_out .= "</tr>";
         }
-        echo "</table>";
+        $html_out .= "</table>";
     }
 
-    echo "<p style=\"font-style:italic;\">This list is updated once a day. New events may take up to 24hrs to appear on this page.</p>";
+    $html_out .= "<p style=\"font-style:italic;\">This list is updated once a day. New events may take up to 24hrs to appear on this page.</p>";
+    return $html_out;
 }
 
 add_shortcode('gc-events-page', 'gc_events_page');
