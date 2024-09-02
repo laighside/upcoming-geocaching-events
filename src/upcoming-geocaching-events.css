@@ -3,6 +3,11 @@
 }
 
 .gc-event-table-row > td {
+  padding: 10px 10px 10px 10px;
+  vertical-align: middle;
+}
+
+.gc-event-table-row img {
   vertical-align: middle;
 }
 

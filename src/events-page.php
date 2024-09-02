@@ -130,7 +130,13 @@ function print_event_date_cell($event, $local_state_name) {
 function gc_events_page() {
     wp_enqueue_style('gc-events');
 
+    $html_out = "";
+
     $options = get_option('gc_events_settings');
+    $custom_css = $options['gc_events_custom_css_style'];
+    if ($custom_css && strlen($custom_css) > 0)
+        $html_out .= "<style>" . $custom_css . "</style>";
+
     $local_events = [];
     $mega_events = [];
     $other_events = [];
@@ -149,8 +155,6 @@ function gc_events_page() {
     // Merge megas and other interstate events all into one table/list
     $national_events = array_merge($mega_events, $other_events);
     sort_events_by_date($national_events);
-
-    $html_out = "";
 
     $local_state_name = get_state_full_name($options['gc_events_state']);
 

@@ -34,6 +34,11 @@ function gc_events_owner_logo_url_field_render() {
     echo "<input type='text' name='gc_events_settings[gc_events_owner_logo_url]' value='" . esc_attr($options['gc_events_owner_logo_url']) . "'>";
 }
 
+function gc_events_custom_css_style_field_render() {
+    $options = get_option( 'gc_events_settings' );
+    echo "<textarea name='gc_events_settings[gc_events_custom_css_style]' rows=\"6\" cols=\"80\">" . esc_html($options['gc_events_custom_css_style']) . "</textarea>";
+}
+
 /**
  * Main function for creating the admin page HTML
  */
@@ -119,6 +124,14 @@ function gc_events_admin_init() {
         'gc_events_owner_logo_url_field',
         'Your Logo URL',
         'gc_events_owner_logo_url_field_render',
+        'gc_events',
+        'gc_events_settings_section'
+    );
+
+    add_settings_field(
+        'gc_events_custom_css_style_field',
+        'Custom CSS Styles',
+        'gc_events_custom_css_style_field_render',
         'gc_events',
         'gc_events_settings_section'
     );
