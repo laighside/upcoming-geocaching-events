@@ -30,6 +30,8 @@ function get_event_icon($event_type) {
         return plugins_url( 'img/cce.gif', __FILE__ );
     case 'Block':
         return plugins_url( 'img/block.gif', __FILE__ );
+    case 'Maze':
+        return plugins_url( 'img/maze.gif', __FILE__ );
     default:
         return "";
     }
@@ -50,6 +52,8 @@ function get_event_full_type($event_type) {
         return "Community Celebration Event";
     case 'Block':
         return "Block Party";
+    case 'Maze':
+        return "GPS Adventures Maze";
     default:
         return "";
     }

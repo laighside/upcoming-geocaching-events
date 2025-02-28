@@ -4,4 +4,4 @@ Five icon images are required:
 * mega.gif
 * cce.gif
 * block.gif
-
+* maze.gif
